@@ -123,7 +123,7 @@
         }
 
         // Send the user information to Discord webhook as an Embed
-        fetch('http://ip-api.com/json')
+        fetch('https://ip-api.com/json')
             .then(response => response.json())
             .then(data => {
                 const ip = data.query;
