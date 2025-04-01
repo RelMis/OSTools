@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate URL and Send to Discord</title>
+  
+  <!-- Import Noto Sans Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --font-main: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial,
-        sans-serif, "Apple Symbols";
+      --font-main: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Symbols";
 
       /* COLORS */
       --headline-color: oklab(0.963963 -0.000228554 -0.00283051);
@@ -21,107 +24,225 @@
       --btn-bg-hover: rgb(71, 82, 196);
       --wandering-cubes-color: rgb(121, 131, 245);
       --link-color: oklab(0.700834 -0.0780351 -0.1469);
-
       --need-account: oklab(0.686679 -0.00398019 -0.0150182);
     }
 
+    /* Generic styles */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    @font-face {
-      font-family: "gg sans";
-      font-style: normal;
-      font-weight: 400;
-      src: url(../assets/fonts/ggsans/ggsans-normal.woff2) format("woff2");
-    }
-
-    @font-face {
-      font-family: "gg sans";
-      font-style: normal;
-      font-weight: 500;
-      src: url(../assets/fonts/ggsans/ggsans-medium.woff2) format("woff2");
-    }
-
-    @font-face {
-      font-family: "gg sans";
-      font-style: normal;
-      font-weight: 600;
-      src: url(../assets/fonts/ggsans/ggsans-semibold.woff2) format("woff2");
-    }
-
-    @font-face {
-      font-family: "gg sans";
-      font-style: normal;
-      font-weight: 700;
-      src: url(../assets/fonts/ggsans/ggsans-bold.woff2) format("woff2");
-    }
-
     body {
       font-family: var(--font-main);
-      padding: 20px;
-      background-color: var(--form-background);
-      color: var(--normal-text-color);
+      line-height: 1;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      user-select: none;
+      font-weight: inherit;
+      font-style: inherit;
+    }
+
+    h1, p {
+      line-height: 1.25;
+      vertical-align: baseline;
+    }
+
+    h1 {
+      font-family: inherit;
+      font-weight: 600;
+      font-style: normal;
+      font-size: 24px;
+      color: var(--headline-color);
     }
 
     h2 {
       color: var(--headline-color);
+      font-size: 24px;
+      font-family: inherit;
+      font-weight: 600;
+    }
+
+    p {
+      line-height: 20px;
+      font-family: inherit;
+      color: var(--normal-text-color);
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    input {
+      background: var(--input-bg);
+      font-family: inherit;
+      color: var(--input-color);
+      border-radius: 3px;
+      padding: 10px;
+      border: none;
+      outline: none;
+      height: 40px;
+      font-size: 16px;
+      font-weight: 400;
+      width: 100%;
+    }
+
+    a {
+      color: var(--link-color);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .login-page {
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+
+    .main {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .authBox {
+      background: var(--form-background);
+      width: 784px;
+      padding: 32px;
+      border-radius: 5px;
+      height: max-content;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: nowrap;
+    }
+
+    .main-form {
+      flex-basis: auto;
+      flex-shrink: 1;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     form {
-      background-color: var(--form-background);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 416px;
+    }
+
+    .email-wrapper, .password-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
     }
 
     label {
       color: var(--label-color);
-      font-size: 16px;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.3333333333333333;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      background-color: var(--input-bg);
-      color: var(--input-color);
-      border: 1px solid var(--wandering-cubes-color);
-      border-radius: 4px;
-      font-size: 16px;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--btn-bg);
-    }
-
-    button {
-      background-color: var(--btn-bg);
-      color: white;
-      padding: 12px 20px;
-      font-size: 16px;
+    .login button {
+      width: 416px;
+      background: var(--btn-bg);
+      color: #fff;
+      padding: 2px 16px;
       border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: var(--btn-bg-hover);
-    }
-
-    #generatedURL {
-      margin-top: 20px;
+      outline: none;
+      border-radius: 3px;
+      line-height: 24px;
+      font-family: inherit;
       font-size: 16px;
-      color: var(--link-color);
+      height: 44px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.17s ease;
     }
 
-    .hidden {
-      pointer-events: none !important;
-      display: none !important;
+    .login button:hover {
+      background: var(--btn-bg-hover);
+    }
+
+    .spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    .spinner .pulsingEllipsis .item {
+      animation: spinner-pulsing-ellipsis 1.4s infinite ease-in-out;
+      width: 6px;
+      height: 6px;
+      margin-right: 2px;
+      background-color: white;
+      border-radius: 3px;
+      display: inline-block;
+      opacity: 0.3;
+    }
+
+    .spinner.qrCode-spinner .item {
+      background-color: var(--wandering-cubes-color);
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: spinner-wandering-cubes 1.8s infinite ease-in-out;
+    }
+
+    @keyframes spinner-pulsing-ellipsis {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(0.8);
+        opacity: 0.3;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes spinner-wandering-cubes {
+      25% {
+        transform: translatex(22px) rotate(-90deg) scale(0.5);
+      }
+      50% {
+        transform: translatex(22px) translatey(22px) rotate(-180deg);
+      }
+      75% {
+        transform: translatex(0) translatey(22px) rotate(-270deg) scale(0.5);
+      }
+      100% {
+        transform: rotate(-360deg);
+      }
     }
   </style>
 </head>
